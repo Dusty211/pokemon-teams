@@ -26,12 +26,12 @@ function init() {
   function deleteData(id) {
   fetch(`http://localhost:3000/pokemons/${id}`, {
   method: 'DELETE',
-})//.then(() => reloadPage());
+}).then(() => reloadPage());     //uncomment for pessimistic
   }
 
   function renderPokemon(data) {
-        mainDiv.innerHTML = ''
-  data.forEach(player => {
+    mainDiv.innerHTML = ''     //moved this to here to stop flicker
+    data.forEach(player => {
     const div = document.createElement('div')
     div.className = 'card'
     const p = document.createElement('p')
@@ -40,6 +40,7 @@ function init() {
     button.innerText = 'Add Pokemon'
     button.className = 'addButton'
     button.ownerId = player.id
+    button.pokemonList = player.pokemons   //added this
     button.addEventListener('click', onAdd)
     const ul = document.createElement('ul')
     mainDiv.appendChild(div)
@@ -62,23 +63,26 @@ function init() {
 }
 
   function onAdd() {
-    const body = {trainer_id: this.ownerId}
-    postData(body)
+    const body = {trainer_id: this.ownerId} // added const
+    if (this.pokemonList.length < 6) { // added
+    postData(body) } else {window.alert('Nice try buddy. You only get six little buddies.')}
   }
 
   function onRelease() {
-
-    this.parentNode.remove()
+    //this.parentNode.remove()        //comment for pessimistic
     const id = this.pokemonId
     deleteData(id)
 
   }
 
   function reloadPage() {
-
+    //used to have line that cleared div here, but caused flash
     getData()
   }
 
   getData()
+
+  //bonus
+
 
 }
