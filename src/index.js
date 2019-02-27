@@ -20,16 +20,17 @@ function init() {
   headers: {
   'Content-Type': 'application/json'
     }
-    }).then(() => reloadPage());
+  }).then(() => reloadPage());
   }
 
   function deleteData(id) {
   fetch(`http://localhost:3000/pokemons/${id}`, {
   method: 'DELETE',
-    }).then(() => reloadPage());
+})//.then(() => reloadPage());
   }
 
   function renderPokemon(data) {
+        mainDiv.innerHTML = ''
   data.forEach(player => {
     const div = document.createElement('div')
     div.className = 'card'
@@ -61,7 +62,7 @@ function init() {
 }
 
   function onAdd() {
-    body = {trainer_id: this.ownerId}
+    const body = {trainer_id: this.ownerId}
     postData(body)
   }
 
@@ -74,7 +75,7 @@ function init() {
   }
 
   function reloadPage() {
-    mainDiv.innerHTML = ''
+
     getData()
   }
 
