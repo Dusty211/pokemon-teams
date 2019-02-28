@@ -1,19 +1,22 @@
 //solution goes here
 
 
-document.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", loadPage);
 
-function init() {
+const mainDiv = document.querySelector('main')
 
-  const mainDiv = document.querySelector('main')
-
-  function getData() {
+function loadPage() {
   fetch(`http://localhost:3000/trainers`)
   .then(res => res.json())
-  .then(json => renderPokemon(json))
-  }
+  .then(json => renderAllTrainers(json))
+}
 
-  function postData(jsonData) {
+function renderAllTrainers(json) {
+  mainDiv.innerHTML = ''
+  json.forEach(renderEachTrainer)
+}
+
+function postData(jsonData) {
   fetch('http://localhost:3000/pokemons', {
   method: 'POST',
   body: JSON.stringify(jsonData),
@@ -21,68 +24,74 @@ function init() {
   'Content-Type': 'application/json'
     }
   }).then(() => reloadPage());
-  }
+}
 
-  function deleteData(id) {
+function deleteData(id) {
   fetch(`http://localhost:3000/pokemons/${id}`, {
   method: 'DELETE',
-}).then(() => reloadPage());     //uncomment for pessimistic
-  }
+  }).then(() => reloadPage());     //uncomment for pessimistic
+}
 
-  function renderPokemon(data) {
-    mainDiv.innerHTML = ''     //moved this to here to stop flicker
-    data.forEach(player => {
+function renderEachTrainer(trainer) {  //(trainer) was (data)
+  //mainDiv.innerHTML = ''     //moved this to here to stop flicker
+    // data.forEach(trainer => {
     const div = document.createElement('div')
     div.className = 'card'
     const p = document.createElement('p')
-    p.innerText = player.name
+    p.innerText = trainer.name
     const button = document.createElement('button')
     button.innerText = 'Add Pokemon'
     button.className = 'addButton'
-    button.ownerId = player.id
-    button.pokemonList = player.pokemons   //added this
+    button.ownerId = trainer.id
+    button.pokemonList = trainer.pokemons   //added this
     button.addEventListener('click', onAdd)
     const ul = document.createElement('ul')
     mainDiv.appendChild(div)
     div.appendChild(p)
     div.appendChild(button)
     div.appendChild(ul)
-    player.pokemons.forEach(pokemon => {
+    trainer.pokemons.forEach(pokemon => {
       const li = document.createElement('li')
       const button = document.createElement('button')
       button.className = 'release'
       button.innerText = 'Release'
-      button.ownerId = player.id
+      button.ownerId = trainer.id
       button.pokemonId = pokemon.id
       button.addEventListener('click', onRelease)
       li.innerText = `${pokemon.nickname} (${pokemon.species})`
       ul.appendChild(li)
       li.appendChild(button)
     })
-  })
+  //})
 }
 
-  function onAdd() {
-    const body = {trainer_id: this.ownerId} // added const
-    if (this.pokemonList.length < 6) { // added
-    postData(body) } else {window.alert('Nice try buddy. You only get six little buddies.')}
-  }
+function onAdd() {
+  const body = {trainer_id: this.ownerId} // added const
+  if (this.pokemonList.length < 6) { // added
+  postData(body) } else {window.alert('Nice try buddy. You only get six little buddies.')}
+}
 
-  function onRelease() {
-    //this.parentNode.remove()        //comment for pessimistic
-    const id = this.pokemonId
-    deleteData(id)
+function renderPokemon(pokemon) {
+  const li = document.createElement('li')
+  const button = document.createElement('button')
+  button.className = 'release'
+  button.innerText = 'Release'
+  button.ownerId = trainer.id
+  button.pokemonId = pokemon.id
+  button.addEventListener('click', onRelease)
+  li.innerText = `${pokemon.nickname} (${pokemon.species})`
+  ul.appendChild(li)
+  li.appendChild(button)
+}
 
-  }
+function onRelease() {
+  //this.parentNode.remove()        //comment for pessimistic
+  const id = this.pokemonId
+  deleteData(id)
 
-  function reloadPage() {
-    //used to have line that cleared div here, but caused flash
-    getData()
-  }
+}
 
-  getData()
-
-  //bonus
-
-
+function reloadPage() {
+  //used to have line that cleared div here, but caused flash
+  loadPage()
 }
